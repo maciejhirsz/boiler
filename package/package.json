@@ -1,0 +1,15 @@
+{
+  "name": "boiler",
+  "subdomain": "terhix.boiler",
+  "scripts": {
+    "start": "server/main.js"
+  },
+  "version": "0.3.3",
+  "engines": {
+    "node": "0.8.x"
+  },
+  "dependencies": {
+    "backbone": "*",
+    "nano": "*"
+  }
+}
