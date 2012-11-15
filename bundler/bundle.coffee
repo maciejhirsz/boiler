@@ -23,8 +23,9 @@ r.config = (options) ->
 
   for label, path of paths
     path = config.assets + '/' + path + '.js'
-    console.log("  --- "+path)
-    files[label] = UglifyJS.minify(path).code
+    if path not in config.ignore
+      console.log("  --- "+path)
+      files[label] = UglifyJS.minify(path).code
 
 bootstrap = fs.readFileSync(config.bootstrap).toString()
 
@@ -42,7 +43,7 @@ readFolder = (path) ->
   for item in fs.readdirSync(path)
     item = nodepath.join(path, item)
 
-    if nodepath.relative(item, config.bootstrap) isnt '' and nodepath.relative(item, config.output) isnt ''
+    if item not in config.ignore and nodepath.relative(item, config.bootstrap) isnt '' and nodepath.relative(item, config.output) isnt ''
 
       ext = item.split('.').pop()
 
