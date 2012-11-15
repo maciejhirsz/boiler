@@ -1,6 +1,10 @@
+define (require) ->
 
-console.log('inside test.coffee')
+  console.log('inside test.coffee')
 
-module.exports =
-  hello: ->
-    document.body.innerHTML = "Hello World!"
+  return module =
+    hello: ->
+      #
+      # Just a demo code
+      #
+      document.body.innerHTML = require('text!templates/hello.mustache')

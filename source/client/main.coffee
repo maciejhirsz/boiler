@@ -1,6 +1,7 @@
+define (require) ->
 
-console.log('start of main.coffee')
+  console.log('start of main.coffee')
 
-test = require('./test/test')
+  test = require('js/test/test')
 
-test.hello()
+  test.hello()
