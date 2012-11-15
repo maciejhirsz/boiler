@@ -21,12 +21,12 @@ require.config
   # ---------------------------------------------
 
   paths:
-    jquery: 'vendor/jquery/jquery-1.8.0.min'
+    #jquery: 'vendor/jquery/jquery-1.8.0.min'
     text: 'vendor/requirejs/text'
-    hogan: 'vendor/hoganjs/hogan-2.0.0.amd'
-    underscore: 'vendor/backbone/underscore-1.3.3'
-    backbone: 'vendor/backbone/backbone-0.9.2'
-    rippl: 'vendor/rippl/rippl.min'
+    #hogan: 'vendor/hoganjs/hogan-2.0.0.amd'
+    #underscore: 'vendor/backbone/underscore-1.3.3'
+    #backbone: 'vendor/backbone/backbone-0.9.2'
+    #rippl: 'vendor/rippl/rippl.min'
 
   # ---------------------------------------------
 
