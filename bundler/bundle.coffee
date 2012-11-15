@@ -15,6 +15,11 @@ config = JSON.parse(fs.readFileSync('config.json'))
 console.log("")
 console.log("  > Running bootstrap confing, reading and uglifying vendor stuff")
 
+isIgnored = (item) ->
+  for path in config.ignore
+    return true if nodepath.relative(item, path) is ''
+  return false
+
 r = ->
 r.config = (options) ->
   paths = options.paths or {}
@@ -23,8 +28,9 @@ r.config = (options) ->
 
   for label, path of paths
     path = config.assets + '/' + path + '.js'
-    if path not in config.ignore
-      console.log("  --- "+path)
+    if not isIgnored(path)
+      label = label.replace(new RegExp('\\\\', 'g'), '/')
+      console.log("  --- "+label+" from "+path)
       files[label] = UglifyJS.minify(path).code
 
 bootstrap = fs.readFileSync(config.bootstrap).toString()
@@ -43,7 +49,7 @@ readFolder = (path) ->
   for item in fs.readdirSync(path)
     item = nodepath.join(path, item)
 
-    if item not in config.ignore and nodepath.relative(item, config.bootstrap) isnt '' and nodepath.relative(item, config.output) isnt ''
+    if not isIgnored(item) and nodepath.relative(item, config.bootstrap) isnt '' and nodepath.relative(item, config.output) isnt ''
 
       ext = item.split('.').pop()
 
@@ -51,12 +57,14 @@ readFolder = (path) ->
 
       if stats.isFile()
         if ext is 'js'
-          console.log("  --- "+item)
-          files[nodepath.relative(config.assets, item)] = UglifyJS.minify(item).code
+          label = nodepath.relative(config.assets, item).replace(new RegExp('\\\\', 'g'), '/')
+          console.log("  --- "+label+" from "+item)
+          files[label] = UglifyJS.minify(item).code
 
         if ext in config.texts
-          console.log("  --- "+item)
-          files['text!'+nodepath.relative(config.assets, item)] = fs.readFileSync(item).toString()
+          label = 'text!'+nodepath.relative(config.assets, item).replace(new RegExp('\\\\', 'g'), '/')
+          console.log("  --- "+label+" from "+item)
+          files[label] = fs.readFileSync(item).toString()
 
       if stats.isDirectory()
         readFolder(item)
