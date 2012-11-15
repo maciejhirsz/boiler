@@ -2,39 +2,75 @@
 
   var files   = {},
       modules = {},
-      require;
+      shim    = {},
+      require = function(path) {
 
-//#!files
+        // resolve mode
+        mode = path.split('!');
+        if (mode.length > 1) {
+          mode = mode[0];
+        } else {
+          mode = null;
+        }
 
-  require = function(path) {
-    var module;
-    // Clear incoming path from heading './' or tailing '.js'
-    path = path.replace(/^\.\//, '').replace(/\.js$/i, '');
+        // the define function
+        var module, define = function(content) {
+          // if argument of define is a function, execute it
+          if(typeof content === 'function') {
+            content = content(require);
+          }
 
-    // Module not in the hash?
-    if (modules[path] === void 0) {
+          module = modules[path] = content;
+        }
+        define.amd = {};
 
-      // Throw an exception if there is no source coresponding to the module
-      if (files[path] === void 0) { throw "Unknown module: " + path; }
+        // Clear incoming path from heading './' or tailing '.js'
+        path = path.replace(/^\.\//, '').replace(/\.js$/i, '');
 
-      // Declare a new module and add it to the modules hash
-      module = modules[path] = { exports: {} };
+        // Module not in the hash?
+        if (modules[path] === void 0) {
+          // Throw an exception if there is no source coresponding to the module
+          if (files[path] === void 0) { throw "Unknown module: " + path; }
 
-      // Parse the file string, pass module object and require function to it
-      eval("(function(module, require){" + files[path] + "})")(module, require);
+          // Handle text mode
+          if (mode === 'text') {
+            return modules[path] = files[path];
+          }
 
-      // Drop the file string to save some memory now it's been parsed
-      delete files[path];
+          // helper vars
+          var d, i, l, s = shim[path];
 
-      // Return module exports
-      return module.exports
-    }
+          // Check for dependencies
+          if (s && s.deps) {
+            for (i = 0, l = s.deps.length; i < l; i++) {
+              require(s.deps[i]);
+            }
+          }
 
-    // Module in the hash? awesome!
-    return modules[path].exports;
-  };
+          // Parse the file string, pass module object and require function to it
+          eval("(function(define){" + files[path] + "})")(define);
 
-  // Require 'main' by default
-  require('main');
+          // Check for shim exports
+          if (s && s.exports) {
+            module = modules[path] = window[s.exports];
+          }
+
+          // Handle undefined
+          if(module === void 0) {
+            module = modules[path] = null;
+          }
+
+          // Drop the file string to save some memory now it's been parsed
+          delete files[path];
+
+          // Return module exports
+          return module
+        }
+
+        // Module in the hash? awesome!
+        return modules[path];
+      };
+
+//#!inject
 
 })(window);
