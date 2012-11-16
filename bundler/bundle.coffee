@@ -8,6 +8,8 @@ UglifyJS = require("uglify-js2")
 bundle = []
 files = {}
 
+throw "Didn't find config.json, copy example.config.json to start!" if not fs.existsSync('config.json')
+
 config = JSON.parse(fs.readFileSync('config.json'))
 
 #################################################
